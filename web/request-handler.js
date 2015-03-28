@@ -13,7 +13,8 @@ var archivesStatic = new nodestatic.Server(archivesFolder);
 
 
 exports.handleRequest = function (req, res) {
-  console.log("this is the request url " + req.url);
+   console.log("this is the request url " + req.url);
+   console.log("method = " + req.method);
   // res.end(archive.paths.list);
   // var home = archive.paths.siteAssets + '/index.html';
 var rawUrl = '';
@@ -21,35 +22,23 @@ switch(req.method){
   case 'GET':
     if(req.url === "/") {
       publicStatic.serve(req, res); 
+      // archive.readListOfUrls();
     } else {
       archivesStatic.serve(req, res);
     }
   break;
   
   case 'POST':
-    var newUrl = url.parse(req.url);
     req.on('data', function(chunk){
       rawUrl += chunk;
-      console.log(chunk.toString());
+      console.log(rawUrl.toString());
     });
     req.on('end', function(){
-      var cleanUrl = rawUrl.slice(4);
-
+      var cleanUrl = JSON.parse(rawUrl);
+      archive.addUrlToList(cleanUrl.url);
       res.writeHead(302, defaultCorsHeaders);
-      archive.addUrlToList();
       res.end();
-    })
-      // console.log(cleanUrl);
-      // archive.readListOfUrls();
-      //TODO
-      //if isUrlInList
-        //if true fetch HTML and serve it up
-      // else 
-       // addUrlToList
-       // get copy of html page.
-      // archivesStatic.serve(req, res); 
-    // });
-    // res.end();
+    });
   break;
   default:
   break;
