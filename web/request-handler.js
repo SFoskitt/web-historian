@@ -19,23 +19,24 @@ exports.handleRequest = function (req, res) {
 var rawUrl = '';
 switch(req.method){
   case 'GET':
-    publicStatic.serve(req, res); 
+    if(req.url === "/") {
+      publicStatic.serve(req, res); 
+    } else {
+      archivesStatic.serve(req, res);
+    }
   break;
   
   case 'POST':
     var newUrl = url.parse(req.url);
-    // console.log("req = " + req.url);
-    // console.log('request URL is: ' + req.url);
     req.on('data', function(chunk){
       rawUrl += chunk;
+      console.log(chunk.toString());
     });
     req.on('end', function(){
       var cleanUrl = rawUrl.slice(4);
-      // fs.readFile(archivesFolder + '/' + cleanUrl, function(err, data){
-      // if (err) throw err;
-      // console.log(data);
-      // res.writeHead(200, defaultCorsHeaders);
-      // // res.write(data);
+
+      res.writeHead(302, defaultCorsHeaders);
+      archive.addUrlToList();
       res.end();
     })
       // console.log(cleanUrl);
